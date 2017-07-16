@@ -1,0 +1,75 @@
+#!/bin/bash
+set -e  # crash on any error
+set -u  # crash on undefined vars
+
+# TODO: Doesn't work on MACs AFAIK due to missing realpath
+PROJECT_ROOT=$(dirname $(realpath "$0"))
+
+# TODO: Sensible fallback
+HTML_ROOT="${HTML_ROOT-/var/www/quinox/processing}"
+INDEXFILE="${HTML_ROOT}/index.html"
+SOLUTIONS_ROOT="${PROJECT_ROOT}/solutions"
+MISC_ROOT="${PROJECT_ROOT}/misc"
+
+log() {
+    echo "$(date) $*"
+}
+
+die() {
+    >&2 echo "$*"
+    exit 1
+}
+
+join_array() {
+    end_of_line="$1"
+    shift
+    for element in "$@"
+    do
+        echo "$element$end_of_line"
+    done
+}
+
+
+
+# Sanity checks
+[ -d "$HTML_ROOT" ] || die "The specified \$HTML_ROOT does not exist: $HTML_ROOT. Please create it."
+[ -e "$INDEXFILE" ] && die "The file $INDEXFILE already exists, please remove it before running this command."
+
+
+# Real run
+[ -d "$HTML_ROOT/solutions" ] || mkdir "$HTML_ROOT/solutions"
+cp "$MISC_ROOT/processing.min.js" "$HTML_ROOT"
+
+cd "$SOLUTIONS_ROOT"
+
+solutions=()
+solutions_as_ul=()
+for i in *.pde
+do
+    log "Copying $i ..."
+    solutions+=("$i")
+    solutions_as_ul+=("<li><a href='$i.html'>$i</a></li>")
+    cp "$SOLUTIONS_ROOT/$i" "$HTML_ROOT/solutions/$i"
+    cp "$MISC_ROOT/template.html" "$HTML_ROOT/$i.html"
+    sed -i "
+    s#%FILENAME%#$i#g;
+    s#%FILEPATH%#solutions/$i#g;
+    s#%GENERATED%#$(date)#g;
+    s#%TIMESTAMP%#$(stat -c "%y" "$SOLUTIONS_ROOT/$i")#g;
+    " "$HTML_ROOT/$i.html"
+done
+
+solutions_as_ul_html=$(join_array '' "${solutions_as_ul[@]}")
+# If tac isn't available use echo; the list won't be reversed but at least the
+# HTML will be generated
+solutions_as_ul_reversed=$(echo "$solutions_as_ul_html" | tac || echo "$solutions_as_ul_html" )
+solutions_as_ul_reversed_no_newlines=$(echo "$solutions_as_ul_reversed" | tr -d '\n')
+
+log "Generating index.html ..."
+cp "${MISC_ROOT}/index.html" "$HTML_ROOT/index.html"
+sed -i "
+s#%SOLUTIONS%#${solutions_as_ul_reversed_no_newlines}#g;
+s#%GENERATED%#$(date)#g;
+" "$HTML_ROOT/index.html"
+
+log "Done."

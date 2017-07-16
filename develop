@@ -1,0 +1,22 @@
+#!/bin/bash
+set -e
+set -u
+
+# TODO: Doesn't work on Macs AFAIK due to missing realpath
+cd $(dirname $(realpath "$0"))
+
+if [ "${HTML_ROOT-}" == "" ]
+then
+    >&2 echo "You need to set \$HTML_ROOT to use this script. It will *DESTROY DATA* so make sure you know what you're doing before using this script."
+    exit 1
+fi
+
+rm "${HTML_ROOT}/index.html" || true
+./generate
+
+while true
+do
+    inotifywait --event close_write,ignored --recursive --exclude '^\.' --exclude '~$' solutions/
+    rm "$HTML_ROOT/index.html"
+    ./generate
+done
