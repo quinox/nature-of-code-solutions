@@ -12,7 +12,7 @@ SOLUTIONS_ROOT="${PROJECT_ROOT}/solutions"
 MISC_ROOT="${PROJECT_ROOT}/misc"
 
 log() {
-    echo "$(date) $*"
+    >&2 echo "$(date) $*"
 }
 
 die() {
@@ -39,30 +39,53 @@ join_array() {
 # Real run
 [ -d "$HTML_ROOT/solutions" ] || mkdir "$HTML_ROOT/solutions"
 cp "$MISC_ROOT/processing.min.js" "$HTML_ROOT"
+cp "$MISC_ROOT/p5.min.js" "$HTML_ROOT"
 
 cd "$SOLUTIONS_ROOT"
 
-solutions=()
-solutions_as_ul=()
-for i in *.pde
-do
-    log "Copying $i ..."
-    solutions+=("$i")
-    solutions_as_ul+=("<li><a href='$i.html'>$i</a></li>")
-    cp "$SOLUTIONS_ROOT/$i" "$HTML_ROOT/solutions/$i"
-    cp "$MISC_ROOT/template.html" "$HTML_ROOT/$i.html"
-    sed -i "
-    s#%FILENAME%#$i#g;
-    s#%FILEPATH%#solutions/$i#g;
-    s#%GENERATED%#$(date)#g;
-    s#%TIMESTAMP%#$(stat -c "%y" "$SOLUTIONS_ROOT/$i")#g;
-    " "$HTML_ROOT/$i.html"
-done
 
-solutions_as_ul_html=$(join_array '' "${solutions_as_ul[@]}")
+do_processing() {
+    solutions_as_ul=()
+    for i in *.pde
+    do
+        log "Copying $i ..."
+        solutions_as_ul+=("<li><a href='$i.html'>$i</a></li>")
+        cp "$SOLUTIONS_ROOT/$i" "$HTML_ROOT/solutions/$i"
+        cp "$MISC_ROOT/template_processingjs.html" "$HTML_ROOT/$i.html"
+        sed -i "
+        s#%FILENAME%#$i#g;
+        s#%FILEPATH%#solutions/$i#g;
+        s#%GENERATED%#$(date)#g;
+        s#%TIMESTAMP%#$(stat -c "%y" "$SOLUTIONS_ROOT/$i")#g;
+        " "$HTML_ROOT/$i.html"
+    done
+    solutions_as_ul_html=$(join_array '' "${solutions_as_ul[@]}")
+    echo "$solutions_as_ul_html"
+}
+
+do_p5() {
+    solutions_as_ul=()
+    for i in *.js
+    do
+        log "Copying $i ..."
+        solutions_as_ul+=("<li><a href='$i.html'>$i</a></li>")
+        cp "$SOLUTIONS_ROOT/$i" "$HTML_ROOT/solutions/$i"
+        cp "$MISC_ROOT/template_p5.html" "$HTML_ROOT/$i.html"
+        sed -i "
+        s#%FILENAME%#$i#g;
+        s#%FILEPATH%#solutions/$i#g;
+        s#%GENERATED%#$(date)#g;
+        s#%TIMESTAMP%#$(stat -c "%y" "$SOLUTIONS_ROOT/$i")#g;
+        " "$HTML_ROOT/$i.html"
+    done
+    solutions_as_ul_html=$(join_array '' "${solutions_as_ul[@]}")
+    echo "$solutions_as_ul_html"
+}
+
 # If tac isn't available use echo; the list won't be reversed but at least the
 # HTML will be generated
-solutions_as_ul_reversed=$(echo "$solutions_as_ul_html" | tac || echo "$solutions_as_ul_html" )
+
+solutions_as_ul_reversed=$( { do_processing; do_p5; } | tac || echo "$solutions_as_ul_html" )
 solutions_as_ul_reversed_no_newlines=$(echo "$solutions_as_ul_reversed" | tr -d '\n')
 
 log "Generating index.html ..."

@@ -1,6 +1,7 @@
 Personal solutions for exercises from [Nature of Code](http://natureofcode.com/) ([github](https://github.com/shiffman/The-Nature-of-Code)).
-Runs in [ProcessingJS](http://processingjs.org/) since I'm working on a
-Chromebook and my SSH client does not seem to support X-Forwarding.
+Runs in [p5.js](https://p5js.org) and [ProcessingJS](http://processingjs.org/)
+since I'm working on a Chromebook and my SSH client does not seem to support
+X-Forwarding.
 
 Setup:
 * Have the repository sitting on a server with SSH, vim and nginx. 
