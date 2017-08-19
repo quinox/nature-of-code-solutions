@@ -23,6 +23,9 @@ module.exports = {
     ]
   },
   'globals': {
+    // From library.js
+    'willEscapeSquare': false,
+    'willEnterSquare': false,
     // Scraped from https://p5js.org/reference/
     // false means you're not allowed to override it
     'blue': false,

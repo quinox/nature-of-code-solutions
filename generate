@@ -69,7 +69,7 @@ do_p5() {
     do
         log "Copying $i ..."
         solutions_as_ul+=("<li><a href='$i.html'>$i</a></li>")
-        cp "$SOLUTIONS_ROOT/$i" "$HTML_ROOT/solutions/$i"
+        cat "$SOLUTIONS_ROOT/library.js" "$SOLUTIONS_ROOT/$i" > "$HTML_ROOT/solutions/$i"
         cp "$MISC_ROOT/template_p5.html" "$HTML_ROOT/$i.html"
         sed -i "
         s#%FILENAME%#$i#g;
