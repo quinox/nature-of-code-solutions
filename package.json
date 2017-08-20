@@ -1,0 +1,25 @@
+{
+  "name": "nature-of-code-solutions",
+  "version": "1.0.0",
+  "description": "Personal solutions for exercises from [Nature of Code](http://natureofcode.com/) ([github](https://github.com/shiffman/The-Nature-of-Code)). Runs in [p5.js](https://p5js.org) and [ProcessingJS](http://processingjs.org/) since I'm working on a Chromebook and my SSH client does not seem to support X-Forwarding.",
+  "main": ".eslintrc.js",
+  "scripts": {
+    "test": "./node_modules/.bin/karma start --single-run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quinox/nature-of-code-solutions.git"
+  },
+  "author": "quinox",
+  "license": "CC0-1.0",
+  "bugs": {
+    "url": "https://github.com/quinox/nature-of-code-solutions/issues"
+  },
+  "homepage": "https://github.com/quinox/nature-of-code-solutions#readme",
+  "dependencies": {
+    "jasmine-core": "^2.7.0",
+    "karma": "^1.7.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-jasmine": "^1.1.0"
+  }
+}

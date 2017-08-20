@@ -20,6 +20,11 @@ die() {
     exit 1
 }
 
+copy() {
+    log "Copying $1..."
+    cp "$1" "$HTML_ROOT"
+}
+
 join_array() {
     end_of_line="$1"
     shift
@@ -38,8 +43,9 @@ join_array() {
 
 # Real run
 [ -d "$HTML_ROOT/solutions" ] || mkdir "$HTML_ROOT/solutions"
-cp "$MISC_ROOT/processing.min.js" "$HTML_ROOT"
-cp "$MISC_ROOT/p5.min.js" "$HTML_ROOT"
+copy "$MISC_ROOT/processing.min.js"
+copy "$MISC_ROOT/p5.min.js"
+copy "$SOLUTIONS_ROOT/library.js"
 
 cd "$SOLUTIONS_ROOT"
 
@@ -69,7 +75,7 @@ do_p5() {
     do
         log "Copying $i ..."
         solutions_as_ul+=("<li><a href='$i.html'>$i</a></li>")
-        cat "$SOLUTIONS_ROOT/library.js" "$SOLUTIONS_ROOT/$i" > "$HTML_ROOT/solutions/$i"
+        cp "$SOLUTIONS_ROOT/$i" "$HTML_ROOT/solutions/$i"
         cp "$MISC_ROOT/template_p5.html" "$HTML_ROOT/$i.html"
         sed -i "
         s#%FILENAME%#$i#g;
