@@ -71,7 +71,7 @@ do_processing() {
 
 do_p5() {
     solutions_as_ul=()
-    for i in *.js
+    for i in exercise*.js
     do
         log "Copying $i ..."
         solutions_as_ul+=("<li><a href='$i.html'>$i</a></li>")
